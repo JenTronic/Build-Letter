@@ -1,5 +1,5 @@
 # Build Letter
-Tool for generating letters using from PrestaShop using LibreOffice Writer
+Tool for generating labels for letters - using LibreOffice Writer and customer data from Prestashop.
 
 ![Build Letter Screenshot](/Screenshots/Build-Letter.png)
 
