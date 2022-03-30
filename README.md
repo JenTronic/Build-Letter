@@ -3,8 +3,9 @@ Tool for generating labels for letters - using LibreOffice Writer and customer d
 
 ![Build Letter Screenshot](/Screenshots/Build-Letter.png)
 
-Requirements for running on Windows:
+Requirements for running the Build Letter tool:
 
+[PrestaShop 1.7](https://www.prestashop.com) (Running with MySQL / MariaDB)  <br />
 [Windows PowerShell 7.0](https://aka.ms/powershell-release?tag=stable) <br />
 [LibreOffice Writer 7.2](https://www.libreoffice.org/download/download) <br />
 [MySQL Connector Net 8.0](https://dev.mysql.com/downloads/connector/net) <br />
