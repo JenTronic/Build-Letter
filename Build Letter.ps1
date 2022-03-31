@@ -11,6 +11,9 @@ $Global:Filename        = ""
 # Load required assembly
 [System.Reflection.Assembly]::LoadWithPartialName("MySql.Data") | Out-Null
 
+# Load printer settings
+. "$PSScriptRoot\Printer Settings.ps1"
+
 function Get-CompressedByteArray {
 
    [CmdletBinding()]
@@ -25,8 +28,7 @@ function Get-CompressedByteArray {
       $gzipStream.Write( $byteArray, 0, $byteArray.Length )
       $gzipStream.Close()
       $output.Close()
-      $tmp = $output.ToArray()
-      Write-Output $tmp
+      Write-Output $output.ToArray()
    }
 
 }
@@ -40,14 +42,11 @@ function Get-DecompressedByteArray {
    )
    Process {
       
-      $input = New-Object System.IO.MemoryStream( , $byteArray )
       $output = New-Object System.IO.MemoryStream
-      $gzipStream = New-Object System.IO.Compression.GzipStream $input, ([IO.Compression.CompressionMode]::Decompress)
+      $gzipStream = New-Object System.IO.Compression.GzipStream $(New-Object System.IO.MemoryStream(, $byteArray)), ([IO.Compression.CompressionMode]::Decompress)
       $gzipStream.CopyTo( $output )
       $gzipStream.Close()
-      $input.Close()
-      [byte[]] $byteOutArray = $output.ToArray()
-      Write-Output $byteOutArray
+      Write-Output $output.ToArray()
    
    }
 
@@ -198,75 +197,6 @@ Function SaveSettings {
 
 }
 
-function Set-Brother_QL-1110NWB {
-
-   $Hex = @"
-   42,00,72,00,6f,00,74,00,68,00,65,00,72,00,20,00,51,00,\
-   4c,00,2d,00,31,00,31,00,31,00,30,00,4e,00,57,00,42,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,01,04,00,05,\
-   dc,00,52,01,0f,65,01,00,02,00,81,01,6b,06,f8,03,64,00,01,00,00,00,2c,01,01,\
-   00,01,00,2c,01,03,00,00,00,31,00,30,00,33,00,6d,00,6d,00,20,00,78,00,20,00,\
-   31,00,36,00,34,00,6d,00,6d,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,1e,00,00,00,ef,00,81,01,00,00,3b,00,01,00,00,00,1e,00,95,07,00,00,01,\
-   00,00,00,42,52,50,54,00,00,00,00,00,00,00,00,6b,81,04,00,07,e5,0b,00,50,52,\
-   49,56,a0,30,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,18,00,00,00,00,00,10,27,10,27,10,27,00,00,\
-   10,27,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,0d,00,18,00,00,00,00,00,03,00,00,95,07,00,00,6b,06,00,00,6b,06,00,00,30,\
-   75,00,00,fe,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,01,00,00,01,3b,00,\
-   00,00,00,00,01,00,01,01,01,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,6b,81,04,00,07,e5,0b,00,00,00,00,00,00,00,12,01,00,0f,01,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
-"@
-   
-   $Data = [byte[]]$($($Hex -replace "\\|\s",'').Split(',') | % { "0x$_"})
-   
-   New-ItemProperty -Path HKCU:Printers\DevModes2 -Name "Brother QL-1110NWB" -PropertyType Binary -Value $Data -Force | Out-Null
-   New-ItemProperty -Path HKCU:Printers\DevModePerUser -Name "Brother QL-1110NWB" -PropertyType Binary -Value $Data -Force | Out-Null
-   
-}
-
-function Reset-Brother_QL-1110NWB {
-
-   $Hex = @"
-   42,00,72,00,6f,00,74,00,68,00,65,00,72,00,20,00,51,00,\
-   4c,00,2d,00,31,00,31,00,31,00,30,00,4e,00,57,00,42,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,01,04,00,05,\
-   dc,00,52,01,0f,65,01,00,02,00,4d,01,68,06,e6,00,64,00,01,00,00,00,2c,01,01,\
-   00,01,00,2c,01,03,00,00,00,4a,00,65,00,6e,00,54,00,72,00,6f,00,6e,00,69,00,\
-   63,00,00,00,6d,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,1e,00,00,00,ef,00,04,01,00,00,23,00,01,00,00,00,1e,00,91,07,00,00,01,\
-   00,00,00,42,52,50,54,00,00,00,00,00,00,00,00,6b,81,04,00,07,e5,0b,00,50,52,\
-   49,56,a0,30,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,18,00,00,00,00,00,10,27,10,27,10,27,00,00,\
-   10,27,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,18,00,02,00,11,00,00,00,03,00,00,91,07,00,00,68,06,00,00,68,06,00,00,30,\
-   75,00,00,fe,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,01,00,00,01,23,00,\
-   00,00,00,00,01,00,01,01,01,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,00,\
-   00,00,00,00,00,6b,81,04,00,07,e5,0b,00,00,00,00,00,00,00,12,01,00,0f,01,00,\
-   00,00,00,00,00,00,00,00,00,00,00,00,00,00,00
-"@
-   
-   $Data = [byte[]]$($($Hex -replace "\\|\s",'').Split(',') | % { "0x$_"})
-   
-   New-ItemProperty -Path HKCU:Printers\DevModes2 -Name "Brother QL-1110NWB" -PropertyType Binary -Value $Data -Force | Out-Null
-   New-ItemProperty -Path HKCU:Printers\DevModePerUser -Name "Brother QL-1110NWB" -PropertyType Binary -Value $Data -Force | Out-Null
-   
-}
 
 # Create a new form
 $Form                    = New-Object system.Windows.Forms.Form
@@ -505,19 +435,7 @@ if (Test-Path -Path $Global:RegistryKey) {
    }
 
    if ([bool]($Settings.PSobject.Properties.name -match "Password")) {
-
-      $securepwd = [System.Text.Encoding]::UTF8.GetString( $(Get-DecompressedByteArray -byteArray $([byte[]][Convert]::FromBase64String($Settings.Password)))) | ConvertTo-SecureString
-
-      $Marshal = [System.Runtime.InteropServices.Marshal]
-      $BinString = $Marshal::SecureStringToBSTR($securepwd)
-      $Password = $Marshal::PtrToStringAuto($BinString)
-
-      $Textbox_Password.Text = $Password
-
-      write-host $Password
-
-      $Marshal::ZeroFreeBSTR($BinString)
-
+      $Textbox_Password.Text = [System.Runtime.InteropServices.Marshal]::PtrToStringAuto([System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($([System.Text.Encoding]::UTF8.GetString( $(Get-DecompressedByteArray -byteArray $([byte[]][Convert]::FromBase64String($Settings.Password)))) | ConvertTo-SecureString)))
    }
 
 }
