@@ -9,3 +9,20 @@ Requirements for running the Build Letter tool:
 [Windows PowerShell 7.0](https://aka.ms/powershell-release?tag=stable) <br />
 [LibreOffice Writer 7.2](https://www.libreoffice.org/download/download) <br />
 [MySQL Connector Net 8.0](https://dev.mysql.com/downloads/connector/net) <br />
+
+# How to use Build Letter?
+
+First start is all about gaining access to your PrestaShop database, and preparing needed templates:<br />
+<ol>
+<li>Run "Build Letter.ps1" using PowerShell.</li>
+<li>Fill in the database information, and hit the "Save Settings" button.</li>
+<li>Edit the LibreOffice Writer templates, located within the Templates folder.</li>
+</ol>
+Now Build Letter is ready for use, so for each label needed, all you do is:<br />
+<ol>
+<li>Run "Build Letter.ps1" using PowerShell.</li>
+<li>Enter a valid order ID, from your PrestaShop webshop.</li>
+<li>Select which type of adress to retrieve, and which template to use - and click the "Generate" button.</li>
+<li>LibreOffice will now open the new label for final modification - i.e entering of the postage code.</li>
+<li>Save the new label, and click the "Print Label" button.
+</ol>
