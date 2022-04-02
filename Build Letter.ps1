@@ -12,7 +12,7 @@ $Global:Filename        = ""
 [System.Reflection.Assembly]::LoadWithPartialName("MySql.Data") | Out-Null
 
 # Load printer settings
-. "$PSScriptRoot\Printer Settings.ps1"
+. "$PSScriptRoot\Functions.ps1"
 
 function Get-CompressedByteArray {
 
@@ -145,7 +145,7 @@ Function PrintLabel {
       $DefaultPrinter = Get-WmiObject -Query "SELECT Name FROM Win32_Printer WHERE Default=$true" | Select-Object -ExpandProperty Name
 
       (New-Object -ComObject WScript.Network).SetDefaultPrinter($Combobox_Printer.SelectedItem.ToString())
-      $PrinterConfig = $("Set-" + $Combobox_Printer.SelectedItem.ToString() -replace '\s', '_')
+      $PrinterConfig = $("Before-" + $Combobox_Printer.SelectedItem.ToString() -replace '\s', '_')
       if (Get-Command $PrinterConfig -errorAction SilentlyContinue) { $PrinterConfig | Invoke-Expression }
       Start-Sleep -Seconds 1
 
@@ -153,7 +153,7 @@ Function PrintLabel {
       Wait-Process -Name swriter -Timeout 30 -ErrorAction SilentlyContinue
 
       Start-Sleep -Seconds 1
-      $PrinterConfig = $("Reset-" + $Combobox_Printer.SelectedItem.ToString() -replace '\s', '_')
+      $PrinterConfig = $("After-" + $Combobox_Printer.SelectedItem.ToString() -replace '\s', '_')
       if (Get-Command $PrinterConfig -errorAction SilentlyContinue) { $PrinterConfig | Invoke-Expression }
       (New-Object -ComObject WScript.Network).SetDefaultPrinter($DefaultPrinter)
 

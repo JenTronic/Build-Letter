@@ -15,9 +15,10 @@ Requirements for running the Build Letter tool:
 First start is all about gaining access to your PrestaShop database, and preparing needed templates:<br />
 <ol>
 <li>Run "Build Letter.ps1" using PowerShell.</li>
-<li>Fill in the database information, and hit the "Save Settings" button.</li>
-<li>Edit the LibreOffice Writer templates, located within the Templates folder.</li>
+<li>Fill in the database information - for your PrestaShop database, and hit the "Save Settings" button.</li>
+<li>Modify the LibreOffice Writer templates, located within the Templates folder.</li>
 </ol>
+
 Now Build Letter is ready for use, so for each label needed, all you do is:<br />
 <ol>
 <li>Run "Build Letter.ps1" using PowerShell.</li>
@@ -26,3 +27,14 @@ Now Build Letter is ready for use, so for each label needed, all you do is:<br /
 <li>LibreOffice will now open the new label for final modification - i.e entering of the postage code.</li>
 <li>Save the new label, and click the "Print Label" button.
 </ol>
+
+# Running code before and after printing 
+
+Some printers may need special configuration, in order to print the labels - or perhaps you just need to run some code when priting.
+
+If running additional code is needed, you may edit the "Functions.ps1" file, and create new functions, that will run automatically, when a specific printer is selected:
+
+Before-[printername]: <span style="color:gray;font-size:0.8em">*(Code is running before printing)*</span><br />
+Before-[printername]: <span style="color:gray;font-size:0.8em">*(Code is running after printing)*</span>
+
+(Note that spaces " " in [printername] must be replaces with underscores "_". )
