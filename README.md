@@ -23,18 +23,18 @@ Now Build Letter is ready for use, so for each label needed, all you do is:<br /
 <ol>
 <li>Run "Build Letter.ps1" using PowerShell.</li>
 <li>Enter a valid order ID, from your PrestaShop webshop.</li>
-<li>Select which type of adress to retrieve, and which template to use - and click the "Generate" button.</li>
+<li>Select which type of address to retrieve, and which template to use - and click the "Generate" button.</li>
 <li>LibreOffice will now open the new label for final modification - i.e entering of the postage code.</li>
 <li>Save the new label, and click the "Print Label" button.
 </ol><br />
 
 # Running code before and after printing 
 
-Some printers may need special configuration, in order to print the labels - or perhaps you just need to run some code when priting.
+Some printers may need special configuration, in order to print the labels - or perhaps you just need to run some code when printing.
 
 If running additional code is needed, you may edit the "Functions.ps1" file, and create new functions, that will run automatically, when a specific printer is used:
 
-Before-[printername]: <span style="color:gray;font-size:0.8em">*(Code is running before printing)*</span><br />
-After-[printername]: <span style="color:gray;font-size:0.8em">*(Code is running after printing)*</span>
+Before-[printer_name]: <span style="color:gray;font-size:0.8em">*(Code is running before printing)*</span><br />
+After-[printer_name]: <span style="color:gray;font-size:0.8em">*(Code is running after printing)*</span>
 
-(Note that spaces " " in [printername] must be replaces with underscores "_". )
+(Note that spaces " " in [printer_name] must be replaced with underscores "_". )
