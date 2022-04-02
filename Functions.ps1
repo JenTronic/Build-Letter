@@ -5,8 +5,8 @@
 
   The functions must be named like this:
 
-  Before-[printername with undercore instead of whitespace]
-  After-[printername with undercore instead of whitespace]
+  Before-[printer name with undercore instead of whitespace]
+  After-[printer name with undercore instead of whitespace]
 
 #>
 
