@@ -32,7 +32,7 @@ Now Build Letter is ready for use, so for each label needed, all you do is:<br /
 
 Some printers may need special configuration, in order to print the labels - or perhaps you just need to run some code when printing.
 
-If running additional code is needed, you may edit the "Functions.ps1" file, and create new functions, that will run automatically, when a specific printer is used:
+If running additional code is needed, you may edit the "Printer Functions.ps1" file, and create new functions, that will run automatically, when a specific printer is used:
 
 BeforePrinting-[printer_name]: <span style="color:gray;font-size:0.8em">*(Code is running before printing)*</span><br />
 AfterPrinting-[printer_name]: <span style="color:gray;font-size:0.8em">*(Code is running after printing)*</span>
