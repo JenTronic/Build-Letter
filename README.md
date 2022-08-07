@@ -5,10 +5,10 @@ Tool for generating labels for letters - using LibreOffice Writer and customer d
 
 Requirements for running the Build Letter tool:
 
-[PrestaShop 1.7](https://www.prestashop.com) <span style="color:gray;font-size:0.8em">*(Running with MySQL / MariaDB)*</span> <br />
-[Windows PowerShell 7.0](https://aka.ms/powershell-release?tag=stable) <br />
-[LibreOffice Writer 7.2](https://www.libreoffice.org/download/download) <br />
-[MySQL Connector Net 8.0](https://dev.mysql.com/downloads/connector/net) <br /><br />
+[PrestaShop 1.7](https://www.prestashop.com) <span style="color:gray;font-size:0.8em">*(Active WebShop running with MySQL / MariaDB)*</span> <br />
+[Windows PowerShell 7.0](https://aka.ms/powershell-release?tag=stable) <span style="color:gray;font-size:0.8em">*(Installed locally)*</span><br />
+[LibreOffice Writer 7.2](https://www.libreoffice.org/download/download) <span style="color:gray;font-size:0.8em">*(Installed locally)*</span><br />
+[MySQL Connector Net 8.0](https://dev.mysql.com/downloads/connector/net) <span style="color:gray;font-size:0.8em">*(Installed locally)*</span><br /><br />
 
 # How to use Build Letter?
 
@@ -25,7 +25,7 @@ Now Build Letter is ready for use, so for each label needed, all you do is:<br /
 <li>Enter a valid order ID, from your PrestaShop webshop.</li>
 <li>Select which type of address to retrieve, and which template to use - and click the "Generate" button.</li>
 <li>LibreOffice will now open the new label for final modification - i.e entering of the postage code.</li>
-<li>Save the new label, and click the "Print Label" button.
+<li>Shutdown LibreOffice (save the updated label), and click the "Print Label" button.
 </ol><br />
 
 # Running code before and after printing 
@@ -37,4 +37,4 @@ If running additional code is needed, you may edit the "Functions.ps1" file, and
 BeforePrinting-[printer_name]: <span style="color:gray;font-size:0.8em">*(Code is running before printing)*</span><br />
 AfterPrinting-[printer_name]: <span style="color:gray;font-size:0.8em">*(Code is running after printing)*</span>
 
-(Note that any whitespaces (" ") in the [printer_name], must be replaced with underscores "_". )
+(Note that any whitespaces " " in the [printer_name], must be replaced with underscores "_". )
