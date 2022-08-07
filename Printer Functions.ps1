@@ -1,16 +1,14 @@
 <#
 
-  In this file, you may add functions to be executed
-  before and after printing on specific printers.
+  In this file, you may add functions to be executed before and after printing
+  with specific printers. The functions must be named like this:
 
-  The functions must be named like this:
-
-  Before-[printer name with undercore instead of whitespace]
-  After-[printer name with undercore instead of whitespace]
+  BeforePrinting-[printername with undercore instead of whitespace]
+  AfterPrinting-[printername with undercore instead of whitespace]
 
 #>
 
-function Before-Brother_QL-1110NWB {
+function BeforePrinting-Brother_QL-1110NWB {
 
    $Hex = @"
    42,00,72,00,6f,00,74,00,68,00,65,00,72,00,20,00,51,00,\
@@ -45,7 +43,7 @@ function Before-Brother_QL-1110NWB {
    
 }
 
-function After-Brother_QL-1110NWB {
+function AfterPrinting-Brother_QL-1110NWB {
 
    $Hex = @"
    42,00,72,00,6f,00,74,00,68,00,65,00,72,00,20,00,51,00,\

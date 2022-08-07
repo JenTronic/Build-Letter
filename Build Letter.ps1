@@ -3,7 +3,11 @@ Add-Type -AssemblyName System.Windows.Forms
 # Settings
 $Global:RegistryKey     = 'HKCU:\SOFTWARE\JenTronic\Label Builder'
 $Global:Templatesfolder = "$PSScriptRoot\Templates"
-$Global:Outfolder       = "$PSScriptRoot\Labels"
+$Global:Outfolder       = "$PSScriptRoot\..\Labels"
+
+# Files
+$Global:PrinterSettings = "$PSScriptRoot\Printer Functions.ps1"
+$Global:Icon            = "$PSScriptRoot\JenTronic.ico"
 
 # Global vars
 $Global:Filename        = ""
@@ -12,8 +16,9 @@ $Global:Filename        = ""
 [System.Reflection.Assembly]::LoadWithPartialName("MySql.Data") | Out-Null
 
 # Load printer settings
-. "$PSScriptRoot\Functions.ps1"
+. $Global:PrinterSettings
 
+# Function for GZip-compressing data
 function Get-CompressedByteArray {
 
    [CmdletBinding()]
@@ -33,6 +38,7 @@ function Get-CompressedByteArray {
 
 }
 
+# Function for decompressing GZip-compressed data
 function Get-DecompressedByteArray {
 
    [CmdletBinding()]
@@ -52,6 +58,7 @@ function Get-DecompressedByteArray {
 
 }
 
+# Fetch data from the remote PrestaShop database, and prepare label for final editing
 Function GenerateLabel {
 
    $Panel_Generate.Enabled = $false
@@ -79,11 +86,24 @@ Function GenerateLabel {
 
       }
 
-      $MYSQL_Command.CommandText = "SELECT invoice_number AS Invoice, Company, CONCAT(firstname, `" `", lastname) AS Name, CONCAT(address1, `", `", address2) AS Address, Postcode AS Zip, City, $($Textbox_TablesPrefix.text)orders.reference AS Reference FROM $($Textbox_TablesPrefix.text)address INNER JOIN $($Textbox_TablesPrefix.text)orders ON $($Textbox_TablesPrefix.text)address.id_address = $($Textbox_TablesPrefix.text)orders.$($AddressTable) WHERE $($Textbox_TablesPrefix.text)orders.id_order = abs($($Textbox_ID.Text -replace '^[^\d]*(\d+)[^\d]*$', '$1'))"
+      $OrderID = [Math]::Abs($($Textbox_ID.Text -replace '^[^\d]*(\d+)[^\d]*$', '$1'))
+
+      $MYSQL_Command.CommandText = "SELECT invoice_number AS Invoice,
+                                           Company,
+                                           CONCAT(firstname, `" `", lastname) AS Name, 
+                                           CONCAT(address1, `", `", address2) AS Address,
+                                           Postcode AS Zip,
+                                           City,
+                                           $($Textbox_TablesPrefix.text)orders.reference AS Reference
+                                    FROM $($Textbox_TablesPrefix.text)address
+                                       INNER JOIN $($Textbox_TablesPrefix.text)orders
+                                          ON $($Textbox_TablesPrefix.text)address.id_address = $($Textbox_TablesPrefix.text)orders.$($AddressTable)
+                                    WHERE $($Textbox_TablesPrefix.text)orders.id_order = $($OrderID)"
+
       $MYSQL_DataAdapter.SelectCommand = $MYSQL_Command
 
       if (-not($MYSQL_DataAdapter.Fill($MYSQL_DataSet, "data") -eq 1)) {
-         throw "Invalid order ID."
+         throw "Invalid order ID ($($OrderID))."
       }
 
       if ([string]$($MYSQL_DataSet.tables[0][0].Company).Length -gt 0) { $Address = "$($MYSQL_DataSet.tables[0][0].Company.trim())`rAtt: " }
@@ -94,23 +114,13 @@ Function GenerateLabel {
 
       $MYSQL_Connection.Close()
 
-      #Load template and insert address
+      #Load template and insert address and reference
       $Global:Filename = "$($Global:OutFolder)\$($Invoice).fodt"
 
       if (-not(Test-Path $Global:Outfolder -PathType Container)) { New-Item -Path $Global:Outfolder -ItemType Directory }
 
       if (Test-Path $Global:Filename -PathType Leaf) {
-
-         $msgBody   = "Label already exists. Please remove the old label:`r`n`r`n$($Global:Filename | Split-Path -leaf)"
-         $msgTitle  = "Label builder"
-         $msgButton = 'OK'
-         $msgImage  = 'Error'
-   
-         Add-Type -AssemblyName PresentationFramework
-         [System.Windows.MessageBox]::Show($msgBody, $msgTitle, $msgButton, $msgImage) | Out-Null
-
-         throw
-
+         throw "Label already exists for order with ID $($OrderID).`r`n`Please remove the old label:`r`n`r`n$($Global:Filename | Split-Path -leaf)"
       }
 
       (Get-Content -path "$($Global:Templatesfolder)\$($Combobox_Type.SelectedItem).fodt" -Raw -Encoding utf8) -replace '\[Adresse\]', ($Address -replace "`r", '<text:line-break/>') -replace '\[Reference\]', $Reference | Out-File $($Global:Filename) -Encoding utf8
@@ -122,7 +132,8 @@ Function GenerateLabel {
    }
    catch {
 
-      write-host $_
+      Add-Type -AssemblyName PresentationFramework
+      [System.Windows.MessageBox]::Show($_, 'Label builder', 'OK', 'Error') | Out-Null
 
    }
 
@@ -133,6 +144,7 @@ Function GenerateLabel {
 
 }
 
+# Send completed label to selected printer
 Function PrintLabel {
 
    $Panel_Generate.Enabled = $false
@@ -145,22 +157,23 @@ Function PrintLabel {
       $DefaultPrinter = Get-WmiObject -Query "SELECT Name FROM Win32_Printer WHERE Default=$true" | Select-Object -ExpandProperty Name
 
       (New-Object -ComObject WScript.Network).SetDefaultPrinter($Combobox_Printer.SelectedItem.ToString())
-      $PrinterConfig = $("Before-" + $Combobox_Printer.SelectedItem.ToString() -replace '\s', '_')
+      $PrinterConfig = $("BeforePrinting-" + $Combobox_Printer.SelectedItem.ToString() -replace '\s', '_')
       if (Get-Command $PrinterConfig -errorAction SilentlyContinue) { $PrinterConfig | Invoke-Expression }
-      Start-Sleep -Seconds 1
+      Start-Sleep -Milliseconds 500
 
       Start-Process -FilePath $Global:Filename -Verb Print -WindowStyle Hidden -Wait
       Wait-Process -Name swriter -Timeout 30 -ErrorAction SilentlyContinue
 
-      Start-Sleep -Seconds 1
-      $PrinterConfig = $("After-" + $Combobox_Printer.SelectedItem.ToString() -replace '\s', '_')
+      Start-Sleep -Milliseconds 500
+      $PrinterConfig = $("AfterPrinting-" + $Combobox_Printer.SelectedItem.ToString() -replace '\s', '_')
       if (Get-Command $PrinterConfig -errorAction SilentlyContinue) { $PrinterConfig | Invoke-Expression }
       (New-Object -ComObject WScript.Network).SetDefaultPrinter($DefaultPrinter)
 
    }
    catch {
 
-      write-host $_
+      Add-Type -AssemblyName PresentationFramework
+      [System.Windows.MessageBox]::Show($_, 'Label builder', 'OK', 'Error') | Out-Null
 
    }
 
@@ -171,7 +184,7 @@ Function PrintLabel {
 
 }
 
-
+# Save database settings to registry
 Function SaveSettings {
 
    try {
@@ -191,12 +204,12 @@ Function SaveSettings {
    }
    catch {
 
-      write-host $_
+      Add-Type -AssemblyName PresentationFramework
+      [System.Windows.MessageBox]::Show($_, 'Label builder', 'OK', 'Error') | Out-Null
 
    }
 
 }
-
 
 # Create a new form
 $Form                    = New-Object system.Windows.Forms.Form
@@ -207,7 +220,7 @@ $Form.text             = "Label Builder"
 $Form.MinimizeBox      = $false
 $Form.MaximizeBox      = $false
 $Form.FormBorderStyle  = 1
-$Form.Icon             = "$PSScriptRoot\JenTronic.ico"
+$Form.Icon             = $Global:Icon
 
 # Main panel
 $Panel_Generate             = New-Object system.Windows.Forms.Panel

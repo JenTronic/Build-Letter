@@ -34,7 +34,7 @@ Some printers may need special configuration, in order to print the labels - or 
 
 If running additional code is needed, you may edit the "Functions.ps1" file, and create new functions, that will run automatically, when a specific printer is used:
 
-Before-[printer_name]: <span style="color:gray;font-size:0.8em">*(Code is running before printing)*</span><br />
-After-[printer_name]: <span style="color:gray;font-size:0.8em">*(Code is running after printing)*</span>
+BeforePrinting-[printer_name]: <span style="color:gray;font-size:0.8em">*(Code is running before printing)*</span><br />
+AfterPrinting-[printer_name]: <span style="color:gray;font-size:0.8em">*(Code is running after printing)*</span>
 
-(Note that spaces " " in [printer_name] must be replaced with underscores "_". )
+(Note that any whitespaces (" ") in the [printer_name], must be replaced with underscores "_". )
